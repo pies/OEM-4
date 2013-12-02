@@ -8,4 +8,8 @@ class String extends Base {
 	 */
 	protected $value = '';
 	
+	public function set($value) {
+		return parent::set((string)$value);
+	}
+	
 }
