@@ -8,4 +8,8 @@ class Int extends Base {
 	 */
 	protected $value = 0;
 	
+	public function set($value) {
+		return parent::set((int)$value);
+	}
+	
 }
