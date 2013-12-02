@@ -12,4 +12,7 @@ class Int extends Base {
 		return parent::set((int)$value);
 	}
 	
+	public function __toString() {
+		return (string) $this->value;
+        }
 }
