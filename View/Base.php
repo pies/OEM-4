@@ -1,7 +1,9 @@
 <?php
 namespace OEM\View;
 
-abstract class Base extends \OEM\Data {
+use OEM\Data;
+
+abstract class Base extends Data {
 	
 	public $httpCode = 200;
 
@@ -10,9 +12,12 @@ abstract class Base extends \OEM\Data {
 	/**
 	 * HTTP headers to send.
 	 * 
-	 * @var OEM\View\HttpHeaders;
+	 * @var HttpHeaders;
 	 */
 	public $headers;
+
+	
+	protected $params;
 
 	public function __construct() {
 		$this->headers = new HttpHeaders;
@@ -32,5 +37,10 @@ abstract class Base extends \OEM\Data {
 		$this->sendHeaders();
 		return $this->render();
 	}
-
+	
+	public function __invoke($params=array()) {
+		$this->params = $params;
+		return (string) $this;
+	}
+	
 }

@@ -1,7 +1,9 @@
 <?php
 namespace OEM\View\Format;
 
-class Json extends \OEM\View\Base {
+use OEM\View\Base;
+
+class Json extends Base {
 	
 	public $contentType = 'application/json';
 

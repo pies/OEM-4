@@ -1,6 +1,9 @@
 <?php
 namespace OEM;
 
+use DOMDocument;
+use DOMElement;
+use RuntimeException;
 use SimpleXMLElement;
 
 assert('extension_loaded("dom")');
@@ -11,10 +14,10 @@ assert('extension_loaded("SimpleXML")');
  */
 class XML extends SimpleXMLElement {
 
-	public static function load($filename, $class=__CLASS__) {
+	public static function load($filename, $class = __CLASS__) {
 		return simplexml_load_file($filename, $class);
 	}
-	
+
 	/**
 	 * Creates an XML element. Alias for SimpleXMLElement->addChild().
 	 *
@@ -23,7 +26,7 @@ class XML extends SimpleXMLElement {
 	 * @param string $namespace
 	 * @return XML
 	 */
-	public function add ($name, $value = null, $namespace = null) {
+	public function add($name, $value = null, $namespace = null) {
 		if (($value === null) && is_object($name)
 			&& (is_a($name, 'XML') || is_subclass_of($name, 'SimpleXMLElement'))
 		) {
@@ -71,7 +74,7 @@ class XML extends SimpleXMLElement {
 	 * @param SimpleXMLElement $newChild An element to add as a child.
 	 * @return XML This tree.
 	 */
-	public function append($newChild){
+	public function append($newChild) {
 		$dom = dom_import_simplexml($this);
 		$newDom = dom_import_simplexml($newChild);
 		$newNode = $dom->ownerDocument->importNode($newDom, true);
@@ -85,17 +88,22 @@ class XML extends SimpleXMLElement {
 	 * @return XML
 	 */
 	public function remove() {
-        $dom = dom_import_simplexml($this);
-        $dom->parentNode->removeChild($dom);
+		$dom = dom_import_simplexml($this);
+		$dom->parentNode->removeChild($dom);
 		return $this;
 	}
 
-	public function replace($newChild) {
-        $dom = dom_import_simplexml($this);
-		$newDom = dom_import_simplexml($newChild);
-		$newNode = $dom->ownerDocument->importNode($newDom, true);
-		$dom->parentNode->appendChild($newNode);
-        $dom->parentNode->removeChild($dom);
+	/**
+	 * Replaces an element with another.
+	 * 
+	 * @param SimpleXMLElement $new_child
+	 * @return XML
+	 */
+	public function replace($new_child) {
+		$dom = dom_import_simplexml($this);
+		$new_dom = dom_import_simplexml($new_child);
+		$new_node = $dom->ownerDocument->importNode($new_dom, true);
+		$dom->parentNode->replaceChild($new_node, $dom);
 		return $this;
 	}
 
@@ -104,7 +112,7 @@ class XML extends SimpleXMLElement {
 	 * @param DOMElement $node
 	 * @return void
 	 */
-	private function removeDOMChildren(\DOMElement $node) {
+	private function removeDOMChildren(DOMElement $node) {
 		while ($node->firstChild) {
 			while ($node->firstChild->firstChild) {
 				self::removeDOMChildren($node->firstChild);
@@ -119,12 +127,12 @@ class XML extends SimpleXMLElement {
 	 * @param string $name Node name
 	 * @param string $text String to append.
 	 * @return XML
-	 * @throws \RuntimeException
+	 * @throws RuntimeException
 	 */
 	public function cdata($name, $text=null) {
 		if ($text === null && !$this->getName()) {
 			$msg = "Element not initialized yet, can't add CDATA.";
-			throw new \RuntimeException($msg);
+			throw new RuntimeException($msg);
 		}
 
 		if ($text === null) {
@@ -137,7 +145,7 @@ class XML extends SimpleXMLElement {
 		$node = dom_import_simplexml($obj);
 		if (!$node) {
 			$msg = 'Node does not exist.';
-			throw new \RuntimeException($msg);
+			throw new RuntimeException($msg);
 		}
 
 		$this->removeDOMChildren($node);
@@ -172,13 +180,13 @@ class XML extends SimpleXMLElement {
 		$tmp = $this->xpath($xpath);
 		return isset($tmp[0]) ? $tmp[0] : null;
 	}
-	
+
 	/**
 	 * Finds the parent of an element.
 	 *
 	 * @return XML
 	 */
-	public function parent() {
+	public function parents() {
 		return $this->find('parent::*');
 	}
 
@@ -188,8 +196,8 @@ class XML extends SimpleXMLElement {
 	 * @param string $filename Filename to save the XML as.
 	 * @return mixed The XML string or operation result if saving.
 	 */
-	public function asXML($format=true, $preserve=false, $noHeader=false) {
-		$doc = new \DOMDocument('1.0', 'UTF-8');
+	public function asXML($format = true, $preserve=false, $noHeader=false) {
+		$doc = new DOMDocument('1.0', 'UTF-8');
 		$doc->formatOutput = $format;
 		$doc->preserveWhiteSpace = $preserve;
 		$doc->loadXML(parent::asXML());

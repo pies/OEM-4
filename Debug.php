@@ -14,12 +14,12 @@ class Debug {
 		$marker = '/*HLMK*/';
 		foreach ($vars as $var) {
 			if (ini_get('html_errors')) {
-				$tmp = highlight_string("<?php\n{$marker}".var_export($var, true), true);
+				$tmp = highlight_string("<?php\n{$marker}".print_r($var, true), true);
 				$pos = strpos($tmp, $marker.'</span>') + strlen($marker.'</span>');
 				$str = trim(substr($tmp, $pos, -7));
 			}
 			else {
-				$str = var_export($var, true);
+				$str = print_r($var, true);
 			}
 				
 			self::output($str, $title);
